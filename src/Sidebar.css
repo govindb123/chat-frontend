@@ -1,0 +1,21 @@
+.sidebar {
+  width: 300px;
+  border-right: 1px solid #ddd;
+  height: 100vh;
+  background: #fafafa;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background: #075e54;
+  color: white;
+}
+
+.sidebar-header button {
+  background: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
