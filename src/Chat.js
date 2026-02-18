@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { createConsumer } from "@rails/actioncable";
 import { getUserIdFromToken } from "./utils/jwt";
+import { API_URL, WS_URL } from "./config";
 import "./Chat.css";
 
-function Chat({ token, conversationId , onBack}) {
+function Chat({ token, conversationId, onBack }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [typingUsers, setTypingUsers] = useState([]);
@@ -19,8 +20,7 @@ function Chat({ token, conversationId , onBack}) {
 
     setMessages([]);
 
-    // fetch messages
-    fetch(`http://localhost:3000/messages/${conversationId}`, {
+    fetch(`${API_URL}/messages/${conversationId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -28,8 +28,7 @@ function Chat({ token, conversationId , onBack}) {
       .then(res => res.json())
       .then(data => setMessages(data));
 
-    // 🔵 mark messages as read
-    fetch(`http://localhost:3000/messages/${conversationId}/read`, {
+    fetch(`${API_URL}/messages/${conversationId}/read`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`
@@ -42,19 +41,17 @@ function Chat({ token, conversationId , onBack}) {
     if (!conversationId) return;
 
     const consumer = createConsumer(
-      `ws://localhost:3000/cable?token=${token}`
+      `${WS_URL}/cable?token=${token}`
     );
 
     const subscription = consumer.subscriptions.create(
       { channel: "ChatChannel", conversation_id: conversationId },
       {
         received(data) {
-          // new message
           if (data.message) {
             setMessages(prev => [...prev, data.message]);
           }
 
-          // typing indicator
           if (data.type === "typing" && data.user_id !== currentUserId) {
             setTypingUsers(prev =>
               data.is_typing
@@ -63,7 +60,6 @@ function Chat({ token, conversationId , onBack}) {
             );
           }
 
-          // read receipt
           if (data.type === "read") {
             setMessages(prev =>
               prev.map(m =>
@@ -94,7 +90,7 @@ function Chat({ token, conversationId , onBack}) {
   const sendMessage = async () => {
     if (!text.trim()) return;
 
-    await fetch("http://localhost:3000/messages", {
+    await fetch(`${API_URL}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,10 +127,8 @@ function Chat({ token, conversationId , onBack}) {
         <span className="chat-title">Chat</span>
       </div>
 
-
       <div className="chat-messages">
-        {Array.isArray(messages) &&
-          messages.map((m, i) => (
+        {messages.map((m, i) => (
           <div
             key={i}
             className={`chat-bubble ${
@@ -144,12 +138,11 @@ function Chat({ token, conversationId , onBack}) {
             <span>{m.content}</span>
 
             {m.sender_id === currentUserId && (
-            <span className={`message-status ${m.status}`}>
-              {m.status === "sent" && "✓"}
-              {m.status === "delivered" && "✓✓"}
-              {m.status === "read" && "✓✓"}
-            </span>
-
+              <span className={`message-status ${m.status}`}>
+                {m.status === "sent" && "✓"}
+                {m.status === "delivered" && "✓✓"}
+                {m.status === "read" && "✓✓"}
+              </span>
             )}
           </div>
         ))}

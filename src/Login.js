@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./Login.css";
+const API_URL = process.env.REACT_APP_API_URL;
 
 function Login({ setToken }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -11,9 +12,9 @@ function Login({ setToken }) {
   const submit = async () => {
     setError("");
 
-    const url = isSignup
-      ? "http://localhost:3000/signup"
-      : "http://localhost:3000/login";
+  const url = isSignup
+    ? `${API_URL}/signup`
+    : `${API_URL}/login`;
 
     const body = isSignup
       ? { auth: { name, email, password } }

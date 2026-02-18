@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "./config";
 import "./Conversations.css";
 
-function Conversations({ token, setActiveConversation , refreshKey}) {
+function Conversations({ token, setActiveConversation, refreshKey }) {
   const [conversations, setConversations] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   // 🔹 Fetch conversations
   useEffect(() => {
-    fetch("http://localhost:3000/conversations", {
+    fetch(`${API_URL}/conversations`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
       .then(res => res.json())
-      .then(data => setConversations(Array.isArray(data) ? data : []));
+      .then(data => setConversations(Array.isArray(data) ? data : []))
+      .catch(() => setConversations([]));
   }, [token, refreshKey]);
 
   // 🔹 Fetch online users
   useEffect(() => {
     const fetchPresence = () => {
-      fetch("http://localhost:3000/presence", {
+      fetch(`${API_URL}/presence`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -27,9 +29,12 @@ function Conversations({ token, setActiveConversation , refreshKey}) {
         .then(res => res.json())
         .then(data =>
           setOnlineUsers(
-            Array.isArray(data.online_user_ids) ? data.online_user_ids : []
+            Array.isArray(data.online_user_ids)
+              ? data.online_user_ids
+              : []
           )
-        );
+        )
+        .catch(() => setOnlineUsers([]));
     };
 
     fetchPresence();

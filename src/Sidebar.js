@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Conversations from "./Conversations";
 import UsersList from "./UsersList";
+import { API_URL } from "./config";
 import "./Sidebar.css";
 
 function Sidebar({ token, setActiveConversation }) {
   const [showUsers, setShowUsers] = useState(false);
 
+  // 🔹 Start chat with selected user
   const startChat = user => {
-    fetch("http://localhost:3000/conversations", {
+    fetch(`${API_URL}/conversations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

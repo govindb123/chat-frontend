@@ -5,11 +5,13 @@ import Conversations from "./Conversations";
 import UsersList from "./UsersList";
 import "./App.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function App() {
   const [token, setToken] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
   const [showUsers, setShowUsers] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0); // 🔥 NEW
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // 🔹 Logout
   const logout = () => {
@@ -27,15 +29,15 @@ function App() {
 
   if (!token) return <Login setToken={setToken} />;
 
-  // 🔹 Open conversation (clears unread)
+  // 🔹 Open conversation (clear unread)
   const openConversation = id => {
     setActiveConversation(id);
-    setRefreshKey(prev => prev + 1); // 🔥 refresh conversations
+    setRefreshKey(prev => prev + 1);
   };
 
-  // 🔹 Start new chat from UsersList
+  // 🔹 Start new chat (FIXED 🔥)
   const startChat = user => {
-    fetch("http://localhost:3000/conversations", {
+    fetch(`${API_URL}/conversations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +49,7 @@ function App() {
     })
       .then(res => res.json())
       .then(conversation => {
-        openConversation(conversation.id); // 🔥 important
+        openConversation(conversation.id);
         setShowUsers(false);
       });
   };
@@ -67,7 +69,7 @@ function App() {
               onClick={logout}
               title="Logout"
             >
-              logout
+              Logout
             </span>
           </div>
         </div>
@@ -78,7 +80,7 @@ function App() {
           <Conversations
             token={token}
             setActiveConversation={openConversation}
-            refreshKey={refreshKey} // 🔥 PASS THIS
+            refreshKey={refreshKey}
           />
         )}
       </div>
