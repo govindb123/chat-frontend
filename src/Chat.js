@@ -12,7 +12,7 @@ function Chat({ token, conversationId, onBack }) {
   const messagesEndRef = useRef(null);
   const subscriptionRef = useRef(null);
 
-  const currentUserId = Number(getUserIdFromToken(token));
+  const currentUserId = token ? Number(getUserIdFromToken(token)) : null;
 
   // ✅ 1️⃣ Load messages + mark as READ
   useEffect(() => {
@@ -133,6 +133,25 @@ function Chat({ token, conversationId, onBack }) {
       subscriptionRef.current?.perform("typing", { is_typing: false });
     }, 1000);
   };
+
+
+  useEffect(() => {
+    if (!conversationId) return;
+
+    // push state when chat opens
+    window.history.pushState({ chat: true }, "");
+
+    const handleBack = () => {
+      onBack(); // same as arrow
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, [conversationId, onBack]);
+
 
   return (
     <div className="chat-container">
