@@ -26,7 +26,17 @@ function Chat({ token, conversationId, onBack }) {
       }
     })
       .then(res => res.json())
-      .then(data => setMessages(data));
+      .then(data => {
+      console.log("MESSAGES API:", data); // debug
+
+      if (Array.isArray(data)) {
+        setMessages(data);
+      } else if (Array.isArray(data.messages)) {
+        setMessages(data.messages);
+      } else {
+        setMessages([]); // prevent crash
+      }
+    });
 
     fetch(`${API_URL}/messages/${conversationId}/read`, {
       method: "POST",
