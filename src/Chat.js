@@ -115,6 +115,10 @@ function Chat({ token, conversationId, onBack }) {
     });
 
     setText("");
+
+    // ⭐ scroll after sending
+    messagesEndRef.current?.scrollIntoView();
+
     subscriptionRef.current?.perform("typing", { is_typing: false });
   };
 
